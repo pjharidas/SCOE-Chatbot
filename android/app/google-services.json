@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "767697846443",
+    "project_id": "scoe-96402",
+    "storage_bucket": "scoe-96402.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767697846443:android:3827e4e371e7bdf3ad77ee",
+        "android_client_info": {
+          "package_name": "com.example.sgce_college_predictor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHE8R93dBVCrNdvY8i1QcCqz5IeqZRP_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
