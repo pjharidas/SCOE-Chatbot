@@ -47,48 +47,49 @@ class ChatbotScreen extends ConsumerWidget {
                 spacing: 30,
                 // reverse: true,
                 children: [
-                    Expanded(
-                      child: Align(
+                  Expanded(
+                    child: Align(
                       alignment: Alignment.bottomCenter,
                       child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: chatMessages.length,
                         itemBuilder: (context, index) {
-                        return ChatBubble(
-                          isBot: chatMessages[index].type == ChatterType.bot,
-                          message: chatMessages[index].message,
-                        );
+                          return ChatBubble(
+                            isBot: chatMessages[index].type == ChatterType.bot,
+                            message: chatMessages[index].message,
+                          );
                         },
                       ),
-                      ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.60,
-                          child: TextField(
-                            controller: chatBoxCtrl,
-                            onSubmitted: (value) {
-                              submitChat(chatMessagesPro, chatBoxCtrl);
-                            },
-                            enableInteractiveSelection: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(30)),
-                              ),
-                              hintText: 'Type your message here',
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.60,
+                        child: TextField(
+                          controller: chatBoxCtrl,
+                          onSubmitted: (value) {
                             submitChat(chatMessagesPro, chatBoxCtrl);
                           },
-                          icon: const Icon(Icons.send),
+                          enableInteractiveSelection: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30)),
+                            ),
+                            hintText: 'Type your message here',
+                          ),
                         ),
-                      ],
-                    )
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          submitChat(chatMessagesPro, chatBoxCtrl);
+                        },
+                        icon: const Icon(Icons.send),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -98,15 +99,16 @@ class ChatbotScreen extends ConsumerWidget {
     );
   }
 
-  void submitChat(
-      ChatMessagesProvider chatMessagesPro, TextEditingController chatBoxCtrl) {
+  void submitChat(ChatMessagesProvider chatMessagesPro,
+      TextEditingController chatBoxCtrl) async {
     log("Adding the message to the chat");
     chatMessagesPro.addMessage(Chat(
       message: chatBoxCtrl.text,
       type: ChatterType.user,
     ));
+    String response = await getResponse(chatBoxCtrl.text);
     Chat reply = Chat(
-      message: returnBotReply(),
+      message: response,
       type: ChatterType.bot,
     );
     chatMessagesPro.addMessage(reply);

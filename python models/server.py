@@ -1,12 +1,11 @@
 from flask import Flask, request, jsonify
 import sys
 import os
+from flask_cors import CORS  # Import Flask-CORS
 from chatbot2 import CollegeCounselorBot 
 
-# Import the chatbot function from chatbot2.py
-# Replace get_response with the actual function name if different
-
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 @app.route('/chat', methods=['POST'])
 def chat():
