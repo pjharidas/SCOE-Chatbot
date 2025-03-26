@@ -4,6 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 class IframeScreen extends StatefulWidget {
+  const IframeScreen({super.key});
+
   @override
   State<IframeScreen> createState() => _IframeScreenState();
 }
