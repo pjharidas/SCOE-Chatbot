@@ -1,3 +1,4 @@
 {
-    "dart.flutterSdkPath": "~/snap/flutter/common/flutter"
+    "dart.flutterSdkPath": "~/snap/flutter/common/flutter",
+    "cmake.sourceDirectory": "/home/prathmeshharidas/freelance projects/SCOE-Preeti/SCOE-Chatbot/linux"
 }

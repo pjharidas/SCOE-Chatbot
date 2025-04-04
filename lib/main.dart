@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sgce_college_predictor/authentication/screens/auth_wrapper.dart';
-import 'package:sgce_college_predictor/chatbot/screens/iframe.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
