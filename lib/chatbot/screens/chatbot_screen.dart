@@ -17,28 +17,53 @@ class ChatbotScreen extends ConsumerWidget {
     final List<Chat> chatMessages = ref.watch(chatMessagesProvider);
     final TextEditingController chatBoxCtrl = TextEditingController();
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: const Text('Chatbot'),
+        elevation: 5,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        ),
+        title: const Text(
+          'Chatbot',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.grey[500],
-        elevation: 2,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
-      body: Padding(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.blueGrey],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
-          spacing: 30,
-          // reverse: true,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: ListView.builder(
+                  reverse: false,
                   shrinkWrap: true,
                   itemCount: chatMessages.length,
                   itemBuilder: (context, index) {
-                    return ChatBubble(
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: ChatBubble(
+                        isBot: chatMessages[index].type == ChatterType.bot,
+                        message: chatMessages[index].message,
+                      ),
                     );
                   },
                 ),
@@ -53,13 +78,17 @@ class ChatbotScreen extends ConsumerWidget {
                   children: [
                     ...[
                       'List all colleges',
-                      'What college can i get with 90 percentile if my category is OPEN',
+                      'What college can I get with 90 percentile if my category is OPEN',
                       'Give me information about Sinhgad College of Engineering',
                       'Give me contact details of SMT. Kashibai Navale College Of Engineering',
                     ].map((suggestion) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: ActionChip(
-                            label: Text(suggestion),
+                            label: Text(suggestion,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500)),
+                            backgroundColor: Colors.deepPurpleAccent,
                             onPressed: () {
                               chatBoxCtrl.text = suggestion;
                             },
@@ -72,27 +101,54 @@ class ChatbotScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.60,
+                Expanded(
+                  flex: 6,
                   child: TextField(
                     controller: chatBoxCtrl,
                     onSubmitted: (value) {
                       submitChat(chatMessagesPro, chatBoxCtrl);
                     },
-                    enableInteractiveSelection: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                      ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 20),
                       hintText: 'Type your message here',
+                      hintStyle:
+                          const TextStyle(color: Colors.grey, fontSize: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    submitChat(chatMessagesPro, chatBoxCtrl);
-                  },
-                  icon: const Icon(Icons.send),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        submitChat(chatMessagesPro, chatBoxCtrl);
+                      },
+                    ),
+                  ),
                 ),
               ],
             )
