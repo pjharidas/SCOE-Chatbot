@@ -1,87 +1,103 @@
 import 'package:flutter/material.dart';
 import 'package:sgce_college_predictor/chatbot/screens/chatbot_screen.dart';
 
-class AuthenticationWrapper extends StatelessWidget {
+class AuthenticationWrapper extends StatefulWidget {
   const AuthenticationWrapper({super.key});
 
   @override
+  State<AuthenticationWrapper> createState() => _AuthenticationWrapperState();
+}
+
+class _AuthenticationWrapperState extends State<AuthenticationWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set up the controller for a 2-second animation
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+
+    // Fade animation for the left pane
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    // Slide animation for the right image
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.2),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String email = '';
-    String password = '';
     return Scaffold(
       body: Row(
-        // direction: Axis.horizontal,
-        // alignment: WrapAlignment.center,
-        spacing: 10,
         children: [
           Flexible(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
               child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 10,
-              children: [
-                Image.asset('assets/images/logo.png'),
-                const Text(
-                  'Welcome to SCOE College Predictor',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                      hintText: 'Enter your email',
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/logo.png'),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Welcome to SCOE College Predictor',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    onChanged: (value) {
-                      email = value;
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                      hintText: 'Enter your password',
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatbotScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text('Try our college predictor chatbot'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 16),
+                      ),
                     ),
-                    onChanged: (value) {
-                      password = value;
-                    },
-                  ),
+                  ],
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    print('Email: $email, Password: $password');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ChatbotScreen()));
-                  },
-                  child: const Text('Login'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print('Forgot password');
-                  },
-                  child: const Text('Forgot password?'),
-                ),
-              ],
+              ),
             ),
-          )),
+          ),
           Flexible(
-              flex: 2,
-              child: Column(
-                children: [
-                  Image.asset(
-                    'assets/images/sgce_building.png',
-                    height: MediaQuery.of(context).size.height * 0.8,
-                  ),
-                ],
-              )),
+            flex: 2,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Image.asset(
+                'assets/images/sgce_building.png',
+                height: MediaQuery.of(context).size.height * 0.8,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ],
       ),
     );

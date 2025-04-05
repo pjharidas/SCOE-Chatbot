@@ -84,6 +84,8 @@ def predict_cutoff(pipe, college, branch, category, year, median_round):
         'Category': category
     }])
     pred = pipe.predict(X_new)[0]
+    # Ensure predicted percentile is within 0 and 100
+    pred = np.clip(pred, 0, 100)
     return float(pred)
 
 def get_recommendations(df, pipe, category, user_pct, current_year):

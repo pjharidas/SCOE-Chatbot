@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sgce_college_predictor/authentication/screens/auth_wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sgce_college_predictor/chatbot/screens/chatbot_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -28,4 +29,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
