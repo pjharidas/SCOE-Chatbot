@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
-import sys
-import os
 from flask_cors import CORS  # Import Flask-CORS
-from chatbot2 import CollegeCounselorBot 
+import chatbot3  # Use the new chatbot module
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -15,9 +13,8 @@ def chat():
         return jsonify({'error': 'No message provided'}), 400
     
     message = data['message']
-    bot = CollegeCounselorBot("colleges.csv")
-    # Call the chatbot function to get a response
-    response = bot.get_response(message)
+    # Use the chatbot function from chatbot3 to process the query.
+    response = chatbot3.process_user_query(message)
     
     return jsonify({'response': response})
 

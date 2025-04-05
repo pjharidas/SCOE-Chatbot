@@ -15,7 +15,7 @@ String returnBotReply() {
   return demoBotReplies[randomNumber];
 }
 
-String BASE_URL = "http://192.168.1.10:5000";
+String BASE_URL = "http://192.168.1.6:5000";
 // String BASE_URL = "";
 
 // write a function to get the response from the server

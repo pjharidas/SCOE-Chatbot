@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 # Load the dataset
-df = pd.read_csv('colleges.csv')
+df = pd.read_csv('python models/colleges.csv')
 
 # Clean and preprocess
 for col in ['Year', 'Round', 'Percentile']:
@@ -68,11 +68,11 @@ def get_college_recommendations(data, category, user_percentile, current_year):
     return recommendations
 
 # Example usage
-user_category = "SC"
-user_percentile = 60
-current_year = 2025
+# user_category = "SC"
+# user_percentile = 60
+# current_year = 2025
 
-recommendations = get_college_recommendations(df, user_category, user_percentile, current_year)
-recommendations
-print(recommendations)
+# recommendations = get_college_recommendations(df, user_category, user_percentile, current_year)
+# recommendations
+# print(recommendations)
 # Example output    
