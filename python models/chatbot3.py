@@ -6,11 +6,11 @@ import re
 nlp = spacy.load("en_core_web_sm")
 
 # Load the CSV data (college details)
-college_df = pd.read_csv('python models/ChatBot-Dataset.csv')
-ml_df = pd.read_csv('python models/colleges.csv')
+college_df = pd.read_csv('ChatBot-Dataset.csv')
+# We no longer need to load ml_df since ML_MODEL2.load_and_clean will handle it
 
-# Import the ML model prediction function from ML_Model.py.
-import ML_Model
+# Import the ML model prediction functions from ML_MODEL2.
+import ML_Model2
 
 def extract_college_name(text):
     """
@@ -135,8 +135,11 @@ def handle_ml_query(query):
     
     current_year = 2025
 
-    # ✅ FIXED LINE HERE
-    predictions = ML_Model.get_college_recommendations(ml_df, user_category, user_percentile, current_year)
+    # Load and prepare the ML model pipeline using ML_MODEL2
+    ml_df_clean = ML_Model2.load_and_clean('colleges.csv')
+    ml_pipe = ML_Model2.build_pipeline()
+    ml_pipe = ML_Model2.fit_full(ml_df_clean, ml_pipe)
+    predictions = ML_Model2.get_recommendations(ml_df_clean, ml_pipe, user_category, user_percentile, current_year)
     
     if not predictions:
         return (f"Based on your percentile of {user_percentile} and category {user_category}, "
