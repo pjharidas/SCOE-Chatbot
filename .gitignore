@@ -45,4 +45,13 @@ app.*.map.json
 /android/app/release
 
 # pycache
-/python_models/__pycache__/
+/python models/__pycache__/
+/python models/*.pyc
+/python models/*.pyo
+/python models/*.pyd
+# Ignore Python virtual environments
+python models/venv/
+/venv/
+/python models/.env/
+/python models/*.pyc
+/python models/__pycache__/
