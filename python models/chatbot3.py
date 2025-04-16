@@ -306,22 +306,21 @@ def handle_ml_query(query: str) -> str:
     query_lower = query.lower()
     # Expand keywords and map to consistent branch names used in predictions
     branch_keywords = {
-        "computer": "Computer Engineering", # Assuming prediction output uses full names
-        "cs": "Computer Engineering",
-        "information": "Information Technology",
-        "it": "Information Technology",
-        "mechanical": "Mechanical Engineering",
-        "mech": "Mechanical Engineering",
-        "electrical": "Electrical Engineering",
-        "e & tc": "E & TC Engineering",
-        "entc": "E & TC Engineering",
-        "electronics": "E & TC Engineering",
-        "civil": "Civil Engineering",
-        "chemical": "Chemical Engineering",
-        "chem": "Chemical Engineering",
-        "biotechnology": "Biotechnology",
-        "biotech": "Biotechnology",
-        "bio-tech": "Biotechnology",
+        "computer": "CS",
+        "information": "IT",
+        "mechanical": "MECH",
+        "mech": "MECH",
+        "electrical": "E & TC",
+        "civil": "CIVIL",
+        "chemical": "CHEM",
+        "biotech": "BIO-TECH",
+        "bio": "BIO-TECH",
+        "biotechnology": "BIO-TECH",
+        "electronics": "E & TC",
+        "e & tc": "E & TC",
+        "etc": "E & TC",
+        "cs": "CS",
+        "it": "IT",
     }
     # Search for keywords in the query
     found_branch_keyword = None
