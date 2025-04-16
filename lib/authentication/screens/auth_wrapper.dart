@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sgce_college_predictor/authentication/services/firebase.dart';
 import 'package:sgce_college_predictor/chatbot/screens/chatbot_screen.dart';
 
 class AuthenticationWrapper extends StatefulWidget {
@@ -14,35 +16,27 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  // Controllers and form for sign-up/sign-in
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isSignUp = true;
-  String? _registeredPassword;
 
   @override
   void initState() {
     super.initState();
-    // Set up the controller for a 2-second animation
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-
-    // Fade animation for the left pane
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
-
-    // Slide animation for the right image
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
-
     _controller.forward();
   }
 
@@ -60,75 +54,80 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      final email = _emailController.text;
-      final password = _passwordController.text;
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
 
-      if (_isSignUp) {
-        // "Sign-up": store the password in memory.
-        _registeredPassword = password;
+      try {
+        AuthService authService = AuthService();
+        if (_isSignUp) {
+          // Call method in firebase.dart to create a new user.
+          final User? user = await authService.register(email, password,context);
+          if (user != null) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Registration Successful'),
+                content: Text('Account registered for $email'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ChatbotScreen()),
+                    ),
+                    child: const Text('OK'),
+                  )
+                ],
+              ),
+            );
+          } 
+        }
+        else{
+          // Call method in firebase.dart to sign in the user.
+          final User? user = await authService.signIn(email, password, context);
+          if (user != null) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Login Successful'),
+                content: Text('Welcome back, $email!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ChatbotScreen()),
+                    ),
+                    child: const Text('OK'),
+                  )
+                ],
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        // Display error dialog if authentication fails.
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Registration Successful'),
-            content: Text('Account registered for $email'),
+            title: const Text('Authentication Failed'),
+            content: Text(e.toString()),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ChatbotScreen()),
-          ),
+                onPressed: () => Navigator.pop(context),
                 child: const Text('OK'),
               )
             ],
           ),
         );
-      } else {
-        // "Sign-in": check the password against the registered one.
-        if (_registeredPassword == null) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Error'),
-              content: const Text('No account found. Please sign up first.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                )
-              ],
-            ),
-          );
-        } // Inside the _submit() method, replace the "Login Successful" case as follows:
-        else if (password == _registeredPassword) {
-          // Instead of showing a dialog, navigate to the chatbot screen.
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ChatbotScreen()),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Authentication Failed'),
-              content: const Text('Incorrect password.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                )
-              ],
-            ),
-          );
-        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Choose colors based on the current mode.
     final Color primaryColor = _isSignUp ? Colors.green : Colors.blue;
     final String headerText = _isSignUp ? 'Create Account' : 'Login';
     final String toggleText = _isSignUp
@@ -155,7 +154,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
-                      // Inline sign-up/sign-in UI
                       Card(
                         elevation: 4,
                         color: _isSignUp ? Colors.green[50] : Colors.blue[50],
@@ -183,10 +181,18 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
                                     labelText: 'Email',
                                     border: OutlineInputBorder(),
                                   ),
-                                  validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Enter an email'
-                                          : null,
+                                  validator: (val) {
+                                    if (val == null || val.isEmpty) {
+                                      return 'Enter an email';
+                                    }
+                                    // Basic email validation
+                                    final emailRegex =
+                                        RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                                    if (!emailRegex.hasMatch(val)) {
+                                      return 'Enter a valid email';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 const SizedBox(height: 10),
                                 TextFormField(
@@ -196,10 +202,15 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
                                     border: OutlineInputBorder(),
                                   ),
                                   obscureText: true,
-                                  validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Enter a password'
-                                          : null,
+                                  validator: (val) {
+                                    if (val == null || val.isEmpty) {
+                                      return 'Enter a password';
+                                    }
+                                    if (val.length < 6) {
+                                      return 'Password must be at least 6 characters';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 const SizedBox(height: 20),
                                 SizedBox(
@@ -212,7 +223,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
                                           vertical: 14),
                                       textStyle: const TextStyle(fontSize: 16),
                                     ),
-                                    child: Text(headerText),
+                                    child: Text(headerText, style: TextStyle(color: Colors.white),),
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -231,17 +242,35 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper>
               ),
             ),
           ),
-          Flexible(
+            Flexible(
             flex: 2,
             child: SlideTransition(
               position: _slideAnimation,
-              child: Image.asset(
-                'assets/images/sgce_building.png',
-                height: MediaQuery.of(context).size.height * 0.8,
-                fit: BoxFit.cover,
+              child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                const Text(
+                  'Meet your College Assistant Chatbot!',
+                  style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                // Network GIF animation resembling a chatbot interaction.
+                Image.network(
+                  'https://media.giphy.com/media/3o72FCZylk0zYUaFi0/giphy.gif',
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  fit: BoxFit.cover,
+                ),
+                ],
+              ),
               ),
             ),
-          ),
+            ),
+          
         ],
       ),
     );

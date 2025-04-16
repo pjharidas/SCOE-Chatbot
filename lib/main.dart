@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sgce_college_predictor/authentication/screens/auth_wrapper.dart';
@@ -8,7 +9,8 @@ import 'firebase_options.dart';
 void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
+);
+ 
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -25,7 +27,21 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: ChatbotScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+        if (snapshot.hasData) {
+          return ChatbotScreen();
+        } else {
+          return AuthenticationWrapper();
+        }
+          }
+          return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+          );
+        },
+      ),
     );
   }
 }

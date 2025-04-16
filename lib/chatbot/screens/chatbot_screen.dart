@@ -1,6 +1,9 @@
 import 'dart:developer';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sgce_college_predictor/authentication/screens/auth_wrapper.dart';
 import 'package:sgce_college_predictor/chatbot/models/chat.dart';
 import 'package:sgce_college_predictor/chatbot/providers/demo_provider.dart';
 import 'package:sgce_college_predictor/chatbot/services/demo_service.dart';
@@ -52,17 +55,51 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     ref.listen<List<Chat>>(chatMessagesProvider, (_, __) {
       _scrollToBottom();
     });
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
+      bottomNavigationBar: Container(
+        height: 20,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 4,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Text(
+          currentUser?.email?.toString() ??
+              'guest' + ": " + (currentUser?.uid?.toString() ?? ''),
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         title: const Text(
-          'Chatbot',
+          'College Predictor and assistant Chatbot',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: "Logout",
+            icon: const Icon(Icons.logout, color: Colors.black),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AuthenticationWrapper(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -82,82 +119,100 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                 itemCount: chatMessages.length,
                 itemBuilder: (context, index) {
                   String fullMessage = chatMessages[index].message;
-                  int indexOfBioTech = fullMessage.indexOf("Biotechnology Intake") -1;
-                  int indexOfFee = fullMessage.indexOf("Fee (Open)") -1;
-                  int indexOfAddDocs = fullMessage.indexOf("Admission Documents Required:") -1;
-                    int indexOfClubs = fullMessage.indexOf("Clubs:") -1;
-                    int indexOfCulturalAct = fullMessage.indexOf("Cultural Activities:") -1;
-                 Widget child =  chatMessages[index].message.length > 900 ?
-                    Column(
-                      children: [
-                        ChatBubble(
-                      onEdit: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                      },
-                      onRegenerate: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                        submitChat(chatMessagesPro, _chatBoxCtrl);
-                      },
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message.substring(0, indexOfBioTech),
-                    ),
-                        ChatBubble(
-                      onEdit: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                      },
-                      onRegenerate: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                        submitChat(chatMessagesPro, _chatBoxCtrl);
-                      },
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message.substring(indexOfBioTech, indexOfFee),
-                    ),
-                        ChatBubble(
-                      onEdit: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                      },
-                      onRegenerate: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                        submitChat(chatMessagesPro, _chatBoxCtrl);
-                      },
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message.substring( indexOfFee,indexOfAddDocs),
-                    ),
-                        ChatBubble(
-                      onEdit: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                      },
-                      onRegenerate: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                        submitChat(chatMessagesPro, _chatBoxCtrl);
-                      },
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message.substring( indexOfAddDocs,indexOfClubs),
-                    ),
-                    ChatBubble(
-                      onEdit: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                      },
-                      onRegenerate: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                        submitChat(chatMessagesPro, _chatBoxCtrl);
-                      },
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message.substring( indexOfClubs,indexOfCulturalAct),
-                    )
-                      ],
-                    )
-                     :ChatBubble(
-                      onEdit: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                      },
-                      onRegenerate: () {
-                        _chatBoxCtrl.text = chatMessages[index].message;
-                        submitChat(chatMessagesPro, _chatBoxCtrl);
-                      },
-                      isBot: chatMessages[index].type == ChatterType.bot,
-                      message: chatMessages[index].message,
-                    );
+                  int indexOfBioTech =
+                      fullMessage.indexOf("Biotechnology Intake") - 1;
+                  int indexOfFee = fullMessage.indexOf("Fee (Open)") - 1;
+                  int indexOfAddDocs =
+                      fullMessage.indexOf("Admission Documents Required:") - 1;
+                  int indexOfClubs = fullMessage.indexOf("Clubs:") - 1;
+                  int indexOfCulturalAct =
+                      fullMessage.indexOf("Cultural Activities:") - 1;
+                  Widget child = chatMessages[index].message.length > 900
+                      ? Column(
+                          children: [
+                            ChatBubble(
+                              onEdit: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                              },
+                              onRegenerate: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                                submitChat(chatMessagesPro, _chatBoxCtrl);
+                              },
+                              isBot:
+                                  chatMessages[index].type == ChatterType.bot,
+                              message: chatMessages[index]
+                                  .message
+                                  .substring(0, indexOfBioTech),
+                            ),
+                            ChatBubble(
+                              onEdit: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                              },
+                              onRegenerate: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                                submitChat(chatMessagesPro, _chatBoxCtrl);
+                              },
+                              isBot:
+                                  chatMessages[index].type == ChatterType.bot,
+                              message: chatMessages[index]
+                                  .message
+                                  .substring(indexOfBioTech, indexOfFee),
+                            ),
+                            ChatBubble(
+                              onEdit: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                              },
+                              onRegenerate: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                                submitChat(chatMessagesPro, _chatBoxCtrl);
+                              },
+                              isBot:
+                                  chatMessages[index].type == ChatterType.bot,
+                              message: chatMessages[index]
+                                  .message
+                                  .substring(indexOfFee, indexOfAddDocs),
+                            ),
+                            ChatBubble(
+                              onEdit: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                              },
+                              onRegenerate: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                                submitChat(chatMessagesPro, _chatBoxCtrl);
+                              },
+                              isBot:
+                                  chatMessages[index].type == ChatterType.bot,
+                              message: chatMessages[index]
+                                  .message
+                                  .substring(indexOfAddDocs, indexOfClubs),
+                            ),
+                            ChatBubble(
+                              onEdit: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                              },
+                              onRegenerate: () {
+                                _chatBoxCtrl.text = chatMessages[index].message;
+                                submitChat(chatMessagesPro, _chatBoxCtrl);
+                              },
+                              isBot:
+                                  chatMessages[index].type == ChatterType.bot,
+                              message: chatMessages[index]
+                                  .message
+                                  .substring(indexOfClubs, indexOfCulturalAct),
+                            )
+                          ],
+                        )
+                      : ChatBubble(
+                          onEdit: () {
+                            _chatBoxCtrl.text = chatMessages[index].message;
+                          },
+                          onRegenerate: () {
+                            _chatBoxCtrl.text = chatMessages[index].message;
+                            submitChat(chatMessagesPro, _chatBoxCtrl);
+                          },
+                          isBot: chatMessages[index].type == ChatterType.bot,
+                          message: chatMessages[index].message,
+                        );
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: child,
@@ -183,6 +238,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 4), // Reduced horizontal padding
                           child: ActionChip(
+                            shadowColor: Colors.deepPurple,
+                            elevation: 5,
                             label: Text(suggestion,
                                 style: const TextStyle(
                                     color: Colors.white,

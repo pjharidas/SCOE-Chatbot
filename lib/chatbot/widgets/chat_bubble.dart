@@ -15,10 +15,17 @@ class ChatBubble extends StatelessWidget {
         Align(
           alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Increased vertical padding
+            padding: const EdgeInsets.only(left: 20,right:20, top: 10), // Increased vertical padding
             margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5), // Adjusted vertical margin
             decoration: BoxDecoration(
               color: isBot ? Colors.blue : Colors.green,
+              boxShadow: [
+                BoxShadow(
+                  color: isBot ? Colors.blue.withOpacity(0.8) : Colors.green.withOpacity(0.8),
+                  blurRadius: 4,
+                  offset: const Offset(2, 2), // Adjust the offset as needed
+                ),
+              ],
               borderRadius: BorderRadius.only(
                 topLeft: isBot ? Radius.circular(0) : Radius.circular(20),
                 topRight: Radius.circular(20),
