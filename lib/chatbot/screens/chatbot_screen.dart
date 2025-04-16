@@ -81,9 +81,73 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                 // shrinkWrap: true, // Avoid shrinkWrap with Expanded
                 itemCount: chatMessages.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: ChatBubble(
+                  String fullMessage = chatMessages[index].message;
+                  int indexOfBioTech = fullMessage.indexOf("Biotechnology Intake") -1;
+                  int indexOfFee = fullMessage.indexOf("Fee (Open)") -1;
+                  int indexOfAddDocs = fullMessage.indexOf("Admission Documents Required:") -1;
+                    int indexOfClubs = fullMessage.indexOf("Clubs:") -1;
+                    int indexOfCulturalAct = fullMessage.indexOf("Cultural Activities:") -1;
+                 Widget child =  chatMessages[index].message.length > 900 ?
+                    Column(
+                      children: [
+                        ChatBubble(
+                      onEdit: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                      },
+                      onRegenerate: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                        submitChat(chatMessagesPro, _chatBoxCtrl);
+                      },
+                      isBot: chatMessages[index].type == ChatterType.bot,
+                      message: chatMessages[index].message.substring(0, indexOfBioTech),
+                    ),
+                        ChatBubble(
+                      onEdit: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                      },
+                      onRegenerate: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                        submitChat(chatMessagesPro, _chatBoxCtrl);
+                      },
+                      isBot: chatMessages[index].type == ChatterType.bot,
+                      message: chatMessages[index].message.substring(indexOfBioTech, indexOfFee),
+                    ),
+                        ChatBubble(
+                      onEdit: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                      },
+                      onRegenerate: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                        submitChat(chatMessagesPro, _chatBoxCtrl);
+                      },
+                      isBot: chatMessages[index].type == ChatterType.bot,
+                      message: chatMessages[index].message.substring( indexOfFee,indexOfAddDocs),
+                    ),
+                        ChatBubble(
+                      onEdit: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                      },
+                      onRegenerate: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                        submitChat(chatMessagesPro, _chatBoxCtrl);
+                      },
+                      isBot: chatMessages[index].type == ChatterType.bot,
+                      message: chatMessages[index].message.substring( indexOfAddDocs,indexOfClubs),
+                    ),
+                    ChatBubble(
+                      onEdit: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                      },
+                      onRegenerate: () {
+                        _chatBoxCtrl.text = chatMessages[index].message;
+                        submitChat(chatMessagesPro, _chatBoxCtrl);
+                      },
+                      isBot: chatMessages[index].type == ChatterType.bot,
+                      message: chatMessages[index].message.substring( indexOfClubs,indexOfCulturalAct),
+                    )
+                      ],
+                    )
+                     :ChatBubble(
                       onEdit: () {
                         _chatBoxCtrl.text = chatMessages[index].message;
                       },
@@ -93,7 +157,10 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                       },
                       isBot: chatMessages[index].type == ChatterType.bot,
                       message: chatMessages[index].message,
-                    ),
+                    );
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: child,
                   );
                 },
               ),

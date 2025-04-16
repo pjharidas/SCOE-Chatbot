@@ -26,11 +26,52 @@ class ChatBubble extends StatelessWidget {
                 bottomRight: isBot ? Radius.circular(20) : Radius.circular(0),
               ),
             ),
-            child: SelectableText(message,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500)),
+            child: SelectableText.rich(
+              (() {
+              TextSpan parseMessage(String message) {
+                List<TextSpan> spans = [];
+                final defaultStyle = const TextStyle(
+                  color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500);
+                final headingStyle = defaultStyle.copyWith( 
+                  fontSize: 20, fontWeight: FontWeight.bold);
+        
+                for (var line in message.split('\n')) {
+                if (line.startsWith('---') && line.endsWith('---')) {
+                  // Heading text between --- and ---
+                  final content = line.substring(3, line.length - 3).trim();
+                  spans.add(TextSpan(text: content, style: headingStyle,));
+                  spans.add(const TextSpan(text: "\n"));
+                } else if (line.startsWith('- ')) {
+                  // List item starting with '- '
+                  final content = line.substring(2).trim();
+                  spans.add(TextSpan(text: '    • $content', style: defaultStyle));
+                  spans.add(const TextSpan(text: "\n"));
+                } else {
+                  int currentIndex = 0;
+                  final regex = RegExp(r'\*(.*?)\*');
+                  for (final match in regex.allMatches(line)) {
+                  if (match.start > currentIndex) {
+                    spans.add(TextSpan(
+                      text: line.substring(currentIndex, match.start),
+                      style: defaultStyle));
+                  }
+                  spans.add(TextSpan(
+                    text: match.group(1),
+                    style: defaultStyle.copyWith(fontWeight: FontWeight.bold)));
+                  currentIndex = match.end;
+                  }
+                  if (currentIndex < line.length) {
+                  spans.add(TextSpan(
+                    text: line.substring(currentIndex), style: defaultStyle));
+                  }
+                  // Add newline after processing the full line
+                  spans.add(const TextSpan(text: "\n"));
+                }
+                }
+                return TextSpan(children: spans, style: defaultStyle);
+              }
+              return parseMessage(message);
+              })(),),
           ),
         ),
         if (!isBot) // Only show buttons below user messages

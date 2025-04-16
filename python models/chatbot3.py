@@ -247,15 +247,15 @@ def answer_csv_query(query: str) -> str:
             # Else, use single_field if identified
             elif single_field and single_field in college_row and pd.notna(college_row[single_field]):
                 value = college_row[single_field]
-                responses.append(f"The {single_field} for {college_name} is: {value}.\n")
+                responses.append(f"The *{single_field}* for *{college_name}* is: {value}.\n")
             elif single_field:
-                responses.append(f"The {single_field} for {college_name} is not available.\n")
+                responses.append(f"The *{single_field}* for *{college_name}* is not available.\n")
             # If no specific field is requested, show all available details.
             else:
                 details = []
                 for field in college_df.columns:
                     if pd.notna(college_row[field]):
-                        details.append(f"{field}: {college_row[field]}")
+                        details.append(f"*{field}: *{college_row[field]}")
                 responses.append(f"--- {college_name} Details ---\n" + "\n".join(details) + "\n")
 
 
@@ -299,7 +299,7 @@ def handle_ml_query(query: str) -> str:
 
 
     if not predictions:
-        return (f"Based on your percentile of {user_percentile} and category {user_category}, no matching colleges were found in the prediction model.")
+        return (f"Based on your percentile of *{user_percentile}* and category *{user_category}*, no matching colleges were found in the prediction model.")
 
     # Check if the query already contains a branch filter keyword.
     branch_filter = None
@@ -341,14 +341,14 @@ def handle_ml_query(query: str) -> str:
             if branch_filter.lower() in pred.get('Branch', '').lower()
         ]
         if not filtered_predictions:
-            return (f"Based on your percentile of {user_percentile} and category {user_category}, no colleges were found for the branch '{branch_filter}'.")
+            return (f"Based on your percentile of *{user_percentile}* and category *{user_category}*, no colleges were found for the branch '*{branch_filter}*'.")
         response_lines = [
-            f"Based on your percentile ({user_percentile}) and category ({user_category}), "
-            f"here are potential colleges for '{branch_filter}':"
+            f"Based on your percentile (*{user_percentile}*) and category (*{user_category}*), "
+            f"here are potential colleges for '*{branch_filter}*':"
         ]
     else:
         response_lines = [
-            f"Based on your percentile ({user_percentile}) and category ({user_category}), "
+            f"Based on your percentile *({user_percentile})* and category *({user_category})*, "
             "you might have a chance in these colleges/branches:"
         ]
         # Consider prompting for branch filtering if many results are returned
