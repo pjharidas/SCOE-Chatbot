@@ -24,6 +24,9 @@ def load_and_clean(csv_path):
     # drop incomplete rows
     df.dropna(subset=['College', 'Branch', 'Category', 'Year', 'Round', 'Percentile'], inplace=True)
     df.reset_index(drop=True, inplace=True)
+    
+    # Standardize category column to uppercase
+    df['Category'] = df['Category'].str.strip().str.upper()
     return df
 
 def build_pipeline():
